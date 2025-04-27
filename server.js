@@ -20,8 +20,14 @@ app.use(cors({
       callback(new Error(`Origine non autorisée par CORS: ${origin}`));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
+// Gérer les requêtes OPTIONS
+app.options("*", cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -29,8 +35,15 @@ app.use(cookieParser());
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 const redirectUri = process.env.REDIRECT_URI;
+
 if (!redirectUri) {
   throw new Error("REDIRECT_URI is not defined in .env file");
+}
+if (!clientId) {
+  throw new Error("SPOTIFY_CLIENT_ID is not defined in .env file");
+}
+if (!clientSecret) {
+  throw new Error("SPOTIFY_CLIENT_SECRET is not defined in .env file");
 }
 
 app.get("/", (req, res) => {
@@ -38,9 +51,13 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/token", async (req, res) => {
+  console.log("Requête reçue sur /api/token");
+  console.log("Corps de la requête :", req.body);
+
   const { code } = req.body;
 
   if (!code) {
+    console.log("Erreur : Aucun code fourni");
     return res.status(400).json({ error: "Aucun code fourni dans la requête" });
   }
 
@@ -179,7 +196,7 @@ app.get("/api/spotify/:path(*)", async (req, res) => {
   try {
     const queryString = req.url.includes("?") ? `?${req.url.split("?")[1]}` : "";
     const spotifyUrl = `https://api.spotify.com/v1/${req.params.path}${queryString}`;
-    console.log("Spotify URL:", spotifyUrl); 
+    console.log("Spotify URL:", spotifyUrl);
     const response = await axios({
       method: "get",
       url: spotifyUrl,
@@ -196,4 +213,4 @@ app.get("/api/spotify/:path(*)", async (req, res) => {
   }
 });
 
-module.exports = app; 
+module.exports = app;
