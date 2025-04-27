@@ -67,28 +67,30 @@ app.post("/api/token", async (req, res) => {
       },
     });
 
+    console.log("Réponse de Spotify pour /api/token :", response.data);
+
     res.cookie("access_token", response.data.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: response.data.expires_in * 1000
     });
     res.cookie("refresh_token", response.data.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 30 * 24 * 60 * 60 * 1000
     });
     res.cookie("expires_at", (Date.now() + response.data.expires_in * 1000).toString(), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: response.data.expires_in * 1000
     });
     res.cookie("token_type", response.data.token_type || "Bearer", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: response.data.expires_in * 1000
     });
 
@@ -123,29 +125,31 @@ app.post("/api/refresh-token", async (req, res) => {
       },
     });
 
+    console.log("Réponse de Spotify pour /api/refresh-token :", response.data);
+
     res.cookie("access_token", response.data.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: response.data.expires_in * 1000
     });
     res.cookie("expires_at", (Date.now() + response.data.expires_in * 1000).toString(), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: response.data.expires_in * 1000
     });
     res.cookie("token_type", response.data.token_type || "Bearer", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: response.data.expires_in * 1000
     });
     if (response.data.refresh_token) {
       res.cookie("refresh_token", response.data.refresh_token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: true,
+        sameSite: "none",
         maxAge: 30 * 24 * 60 * 60 * 1000
       });
     }
@@ -160,12 +164,14 @@ app.post("/api/refresh-token", async (req, res) => {
 });
 
 app.get("/api/check-tokens", (req, res) => {
-  res.json({
+  const tokenData = {
     access_token_exists: !!req.cookies.access_token,
     refresh_token_exists: !!req.cookies.refresh_token,
     expires_at: req.cookies.expires_at || null,
     token_type: req.cookies.token_type || null,
-  });
+  };
+  console.log("Résultat de /api/check-tokens :", tokenData);
+  res.json(tokenData);
 });
 
 app.post("/api/logout", (req, res) => {
