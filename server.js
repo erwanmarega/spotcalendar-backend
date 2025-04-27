@@ -8,23 +8,12 @@ require("dotenv").config({
 
 const app = express();
 
-const allowedOrigins = process.env.NODE_ENV === "production"
-  ? [process.env.VERCEL_URL, "https://spotcalendar.vercel.app"].filter(Boolean)
-  : ["http://localhost:5173"];
-
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`Origine non autorisée par CORS: ${origin}`));
-    }
-  },
+  origin: "https://spotcalendar.vercel.app",
   credentials: true,
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
-
 app.options("*", cors());
 
 app.use(express.json());
@@ -51,6 +40,8 @@ app.get("/", (req, res) => {
 
 app.post("/api/token", async (req, res) => {
   console.log("Requête reçue sur /api/token");
+  console.log("Méthode HTTP :", req.method);
+  console.log("En-têtes :", req.headers);
   console.log("Corps de la requête :", req.body);
 
   const { code } = req.body;
@@ -212,7 +203,6 @@ app.get("/api/spotify/:path(*)", async (req, res) => {
   }
 });
 
-// Démarrer le serveur avec un try/catch pour capturer les erreurs
 const port = process.env.PORT || 3000;
 try {
   app.listen(port, () => {
