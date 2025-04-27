@@ -190,8 +190,10 @@ app.get("/api/spotify/:path(*)", async (req, res) => {
   }
 
   try {
+    // Nettoyer les slashes en début et fin de req.params.path
+    const cleanPath = req.params.path.replace(/^\/+|\/+$/g, '');
     const queryString = req.url.includes("?") ? `?${req.url.split("?")[1]}` : "";
-    const spotifyUrl = `https://api.spotify.com/v1/${req.params.path}${queryString}`;
+    const spotifyUrl = `https://api.spotify.com/v1/${cleanPath}${queryString}`;
     console.log("Spotify URL:", spotifyUrl);
     const response = await axios({
       method: "get",
