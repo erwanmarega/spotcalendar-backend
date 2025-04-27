@@ -212,9 +212,15 @@ app.get("/api/spotify/:path(*)", async (req, res) => {
   }
 });
 
+// Démarrer le serveur avec un try/catch pour capturer les erreurs
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Serveur démarré sur le port ${port}`);
-});
+try {
+  app.listen(port, () => {
+    console.log(`Serveur démarré sur le port ${port}`);
+  });
+} catch (error) {
+  console.error("Erreur lors du démarrage du serveur :", error);
+  process.exit(1);
+}
 
 module.exports = app;
