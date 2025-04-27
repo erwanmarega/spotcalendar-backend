@@ -25,7 +25,6 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// Gérer les requêtes OPTIONS
 app.options("*", cors());
 
 app.use(express.json());
@@ -211,6 +210,11 @@ app.get("/api/spotify/:path(*)", async (req, res) => {
     console.error("Statut HTTP :", error.response?.status);
     res.status(error.response?.status || 500).json({ error: "Échec de la requête Spotify", details: error.response?.data });
   }
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Serveur démarré sur le port ${port}`);
 });
 
 module.exports = app;
